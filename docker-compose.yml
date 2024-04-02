@@ -1,0 +1,98 @@
+---
+version: "2.2"
+services:
+  mainZookeeper:
+    image: ${REPOSITORY}/cp-zookeeper:${CONFLUENT_DOCKER_TAG}
+    restart: always
+    hostname: mainZookeeper
+    container_name: mainZookeeper
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      ZOOKEEPER_TICK_TIME: "2000"
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=*"
+    ports:
+      - "2181:2181"
+  mainKafka-1:
+    image: ${REPOSITORY}/cp-server:${CONFLUENT_DOCKER_TAG}
+    hostname: mainKafka-1
+    container_name: mainKafka-1
+    depends_on:
+      - mainZookeeper
+    ports:
+      - "19092:19092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "mainZookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://mainKafka-1:19092
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_NUM_PARTITIONS: 1
+      CONFLUENT_HTTP_SERVER_LISTENERS: "http://0.0.0.0:8090"
+  mainKafka-2:
+    image: ${REPOSITORY}/cp-server:${CONFLUENT_DOCKER_TAG}
+    hostname: mainKafka-2
+    container_name: mainKafka-2
+    depends_on:
+      - mainZookeeper
+    ports:
+      - "19093:19093"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "mainZookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://mainKafka-2:19093
+      KAFKA_BROKER_ID: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_NUM_PARTITIONS: 1
+      CONFLUENT_HTTP_SERVER_LISTENERS: "http://0.0.0.0:8090"
+  mainKafka-3:
+    image: ${REPOSITORY}/cp-server:${CONFLUENT_DOCKER_TAG}
+    hostname: mainKafka-3
+    container_name: mainKafka-3
+    depends_on:
+      - mainZookeeper
+    ports:
+      - "19094:19094"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "mainZookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://mainKafka-3:19094
+      KAFKA_BROKER_ID: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_CONFLUENT_SUPPORT_METRICS_ENABLE: "false"
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 2
+      KAFKA_TRANSACTION_STATE_LOG_NUM_PARTITIONS: 1
+      CONFLUENT_HTTP_SERVER_LISTENERS: "http://0.0.0.0:8090"
+
+  
+
+  ################  ################  ################  ################
+  # JAVA APP
+  ################  ################  ################  ################
+  java_app:
+    hostname: java_app
+    container_name: java_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    stdin_open: true
+    tty: true
